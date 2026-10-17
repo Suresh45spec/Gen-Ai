@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React,{useState} from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import "../auth.form.scss"
 import { useAuth } from '../hooks/useAuth'
@@ -10,22 +10,14 @@ const Login = () => {
 
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
-    const [ error, setError ] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        setError("")
-        try {
-            await handleLogin({ email, password })
-            // Only navigate when login succeeds
-            navigate('/')
-        } catch (err) {
-            // Stay on login page and display the error
-            setError(err.message)
-        }
+        await handleLogin({email,password})
+        navigate('/')
     }
 
-    if (loading) {
+    if(loading){
         return (<main><h1>Loading.......</h1></main>)
     }
 
@@ -34,7 +26,6 @@ const Login = () => {
         <main>
             <div className="form-container">
                 <h1>Login</h1>
-                {error && <p className="error-message">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
                         <label htmlFor="email">Email</label>
