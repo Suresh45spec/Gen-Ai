@@ -1,6 +1,5 @@
 const { GoogleGenAI } = require("@google/genai")
 const { z } = require("zod")
-const { zodToJsonSchema } = require("zod-to-json-schema")
 const puppeteer = require("puppeteer")
 
 const ai = new GoogleGenAI({
@@ -41,16 +40,21 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
                         Job Description: ${jobDescription}
 `
 
+    // zod v4 native JSON Schema conversion (zod-to-json-schema only supports zod v3)
+    const responseSchema = z.toJSONSchema(interviewReportSchema)
+    delete responseSchema.$schema
+
     const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(interviewReportSchema),
+            responseSchema,
         }
     })
 
-    return JSON.parse(response.text)
+    // validate the AI response against the schema before persisting it
+    return interviewReportSchema.parse(JSON.parse(response.text))
 
 
 }
